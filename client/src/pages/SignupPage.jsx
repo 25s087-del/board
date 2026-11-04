@@ -1,0 +1,99 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import api, { getErrorMessage } from '../api.js'
+import { FormBox, Label, Input, Select, Row, SubmitButton, ErrorText, Bottom } from '../components/Form.jsx'
+
+function SignupPage() {
+  const navigate = useNavigate()
+  // 입력값들을 하나의 객체로 관리
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    passwordCheck: '',
+    nickname: '',
+    grade: '1',
+    class_no: '',
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  // 입력칸의 name 속성을 이용해 해당 값만 바꿈
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault() // 폼 제출 시 새로고침 막기
+    setError('')
+
+    // 서버에 보내기 전에 화면에서 먼저 검사
+    if (form.password !== form.passwordCheck) {
+      setError('비밀번호와 비밀번호 확인이 일치하지 않습니다.')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await api.post('/users/signup', {
+        email: form.email,
+        password: form.password,
+        nickname: form.nickname,
+        grade: Number(form.grade),
+        class_no: Number(form.class_no),
+      })
+      alert('회원가입이 완료되었습니다. 로그인해 주세요.')
+      navigate('/login')
+    } catch (err) {
+      setError(getErrorMessage(err)) // 예: 409 → "이미 가입된 이메일입니다."
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <FormBox onSubmit={handleSubmit}>
+      <h2>회원가입</h2>
+      {error && <ErrorText>{error}</ErrorText>}
+
+      <Label>
+        이메일
+        <Input type="email" name="email" value={form.email} onChange={handleChange} required />
+      </Label>
+      <Label>
+        비밀번호 (4자 이상)
+        <Input type="password" name="password" value={form.password} onChange={handleChange} minLength={4} required />
+      </Label>
+      <Label>
+        비밀번호 확인
+        <Input type="password" name="passwordCheck" value={form.passwordCheck} onChange={handleChange} required />
+      </Label>
+      <Label>
+        닉네임
+        <Input name="nickname" value={form.nickname} onChange={handleChange} maxLength={30} required />
+      </Label>
+      <Row>
+        <Label>
+          학년
+          <Select name="grade" value={form.grade} onChange={handleChange}>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+          </Select>
+        </Label>
+        <Label>
+          반
+          <Input type="number" name="class_no" value={form.class_no} onChange={handleChange} min={1} max={20} required />
+        </Label>
+      </Row>
+
+      <SubmitButton type="submit" disabled={loading}>
+        {loading ? '가입 중...' : '회원가입'}
+      </SubmitButton>
+      <Bottom>
+        이미 계정이 있나요? <Link to="/login">로그인</Link>
+      </Bottom>
+    </FormBox>
+  )
+}
+
+export default SignupPage

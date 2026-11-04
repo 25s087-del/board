@@ -34,6 +34,9 @@
 - 1단계(초기 세팅) 완료: client(Vite React, 라이브러리, /api 프록시, BrowserRouter, Layout, Home에서 /api/health 확인), server(Express, .env/.env.example, db.js, /api/health), .gitignore, git 원격 연결. health·프록시 정상 확인. DB 연결은 2단계 전이라 실패가 정상
 - 2단계(DB 스키마) 완료: server/schema.sql (DB 생성, users·posts 테이블), 화면 제목·헤더 로고 "학급 게시판"으로 변경. 로컬 MySQL에 전용 계정 '20503'@'localhost' 생성, "✅ DB 연결 성공" 확인. git 계정은 이 프로젝트에만(--local) 25s087-del로 설정, 첫 커밋 작성자 변경 후 force push
 
+- 3·4단계(회원가입·로그인) 완료: server(routes/users.js — signup(bcrypt, 이메일 중복 409, 학년1~3·반1~20 검사), login(JWT 1일, token+user 반환), me(auth 필요, 비밀번호 제외) / middlewares/auth.js — Bearer 토큰 검사 후 req.user), client(api.js — axios에 토큰 자동 첨부, AuthContext.jsx — localStorage에 token·user 저장, SignupPage, LoginPage, components/Form.jsx 공통 폼 스타일, Header에 로그인 상태별 메뉴 "닉네임(학년-반)"). 화면에서 확인 완료
+
 ### 다음 할 일
-- 3단계: 회원가입 API (bcrypt, 학년·반 포함)
+- 5단계: 게시글 작성 API·화면 (로그인 필요, auth 미들웨어 사용, 카테고리 공지/수행평가/자유/분실물)
+- 이후: 메인 전체 목록+카테고리 필터(작성자 닉네임·학년·반 JOIN), 글 상세·수정·삭제(본인만), 우리 반 글, 마이페이지 조회·수정·탈퇴(/api/users/me 활용)
 - (새 PC라면) server/.env.example 복사 → server/.env 작성(DB_USER=20503, 비밀번호), client·server에서 npm install, git config user.name/email(--local) 설정

@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import Home from './pages/Home.jsx'
+import SignupPage from './pages/SignupPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
 
 function App() {
   return (
@@ -8,6 +10,8 @@ function App() {
       {/* Layout 안에 들어가는 페이지들은 공통 헤더를 함께 보여줌 */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Route>
     </Routes>
   )
