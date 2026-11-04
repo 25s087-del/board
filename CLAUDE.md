@@ -7,7 +7,7 @@
 - server: Node.js + Express(ES module)
   dependencies: bcrypt ^6.0.0, cors ^2.8.6, dotenv ^18.0.7, express ^5.3.0, jsonwebtoken ^9.0.3, multer ^2.5.0, mysql2 ^3.24.5
   devDependencies: nodemon ^3.1.14
-- DB: MySQL (VMware 가상머신 안에서 실행), DB 이름은 board_20503
+- DB: 로컬 MySQL(Workbench), 접속 127.0.0.1 / 전용 계정 20503, DB 이름은 board_20503
 - vite 프록시: /api → http://localhost:5000
 
 ## 테이블
@@ -32,7 +32,8 @@
 ## 진행 기록
 ### 완료한 단계
 - 1단계(초기 세팅) 완료: client(Vite React, 라이브러리, /api 프록시, BrowserRouter, Layout, Home에서 /api/health 확인), server(Express, .env/.env.example, db.js, /api/health), .gitignore, git 원격 연결. health·프록시 정상 확인. DB 연결은 2단계 전이라 실패가 정상
+- 2단계(DB 스키마) 완료: server/schema.sql (DB 생성, users·posts 테이블), 화면 제목·헤더 로고 "학급 게시판"으로 변경. 로컬 MySQL에 전용 계정 '20503'@'localhost' 생성, "✅ DB 연결 성공" 확인. git 계정은 이 프로젝트에만(--local) 25s087-del로 설정, 첫 커밋 작성자 변경 후 force push
 
 ### 다음 할 일
-- 2단계: server/schema.sql 작성 (바뀐 테이블 기준: users에 grade·class_no, posts에 category) → 가상머신 MySQL에서 실행 후 DB 연결 성공 확인
-- server/.env의 DB_HOST에 가상머신 IP 입력 필요
+- 3단계: 회원가입 API (bcrypt, 학년·반 포함)
+- (새 PC라면) server/.env.example 복사 → server/.env 작성(DB_USER=20503, 비밀번호), client·server에서 npm install, git config user.name/email(--local) 설정

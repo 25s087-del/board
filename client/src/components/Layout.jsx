@@ -6,7 +6,7 @@ function Layout() {
   return (
     <>
       <Header>
-        <Logo to="/">게시판</Logo>
+        <Logo to="/">학급 게시판</Logo>
       </Header>
       <Main>
         {/* Outlet 자리에 현재 주소에 맞는 페이지가 들어감 */}
