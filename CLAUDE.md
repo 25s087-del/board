@@ -42,6 +42,8 @@
 
 - 6단계(마이페이지·우리 반 글) 완료: server(users.js — PUT /me(닉네임·학년·반, 비밀번호는 선택·bcrypt, 새 토큰 반환), DELETE /me(글은 cascade 삭제) / posts.js — GET /my-class(posts JOIN users + JOIN users me로 DB 기준 같은 학년·반)), client(MyPage, ClassPage, 헤더 [우리 반] 메뉴·닉네임 배지 → /mypage, Form.jsx에 SuccessText). 화면에서 확인 완료
 
+- 최종 점검 완료: 필수 요구사항 전부 코드와 대조 확인, README.md(소개·기능·API·실행 방법) 작성, server/.env.example의 DB_NAME(board_20503)·DB_HOST·DB_USER 기본값 수정
+
 ### 다음 할 일
-- 필수 요구사항은 6단계로 모두 구현됨. 이후에는 버그 수정·제출 준비만 (필수 외 기능 추가 안 함)
+- 필수 요구사항 모두 구현·점검 완료. 이후에는 버그 수정·제출 준비만 (필수 외 기능 추가 안 함)
 - (새 PC라면) server/.env.example 복사 → server/.env 작성(DB_USER=20503, 비밀번호), client·server에서 npm install, git config user.name/email(--local) 설정
