@@ -21,6 +21,7 @@
 - JOIN 메뉴 "우리 반 글": 로그인한 사용자와 같은 학년·반 학생들의 글 (posts JOIN users)
 
 ## 작업 규칙
+- 필수 요구사항 외 기능은 추가하지 않기
 - 한 번에 한 단계만 구현하고, 끝나면 내가 직접 확인할 방법을 알려줄 것
 - 내가 확인했다고 하면 git add . → git commit -m "Feat: 작업내용" → git push origin main
 - .env와 node_modules는 절대 커밋하지 않기
@@ -39,7 +40,8 @@
 - 5단계(게시글 CRUD) 작성: server/routes/posts.js (목록 posts JOIN users + ?category 필터, 상세, 작성(auth), 수정·삭제(auth + 본인 아니면 403)), client(Home 목록·필터, PostDetailPage, PostCreatePage, PostEditPage, components/PostForm.jsx, constants.js). 화면에서 확인 완료
 - 디자인(Style) 완료: styles/theme.js(색·둥글기·그림자·카테고리 색·모바일 480px), index.html에 Pretendard CDN, components/PostCard·CategoryChip, Form.jsx(Card·Button·TextArea 추가), 헤더 sticky, 전체 코드 주석 제거. 화면에서 확인 완료
 
+- 6단계(마이페이지·우리 반 글) 완료: server(users.js — PUT /me(닉네임·학년·반, 비밀번호는 선택·bcrypt, 새 토큰 반환), DELETE /me(글은 cascade 삭제) / posts.js — GET /my-class(posts JOIN users + JOIN users me로 DB 기준 같은 학년·반)), client(MyPage, ClassPage, 헤더 [우리 반] 메뉴·닉네임 배지 → /mypage, Form.jsx에 SuccessText). 화면에서 확인 완료
+
 ### 다음 할 일
-- 6단계: 우리 반 글 (GET /api/posts/my-class, posts JOIN users로 로그인 사용자와 같은 학년·반 글, 헤더 메뉴 추가)
-- 이후: 마이페이지 조회·수정(학년·반 포함)·탈퇴 (/api/users/me 활용)
+- 필수 요구사항은 6단계로 모두 구현됨. 이후에는 버그 수정·제출 준비만 (필수 외 기능 추가 안 함)
 - (새 PC라면) server/.env.example 복사 → server/.env 작성(DB_USER=20503, 비밀번호), client·server에서 npm install, git config user.name/email(--local) 설정

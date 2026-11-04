@@ -139,6 +139,15 @@ export const ErrorText = styled.p`
   font-weight: 500;
 `
 
+export const SuccessText = styled.p`
+  padding: 12px 14px;
+  border-radius: ${radius.control};
+  background: ${colors.primaryLight};
+  color: ${colors.primaryHover};
+  font-size: 14px;
+  font-weight: 500;
+`
+
 export const Bottom = styled.p`
   text-align: center;
   font-size: 14px;

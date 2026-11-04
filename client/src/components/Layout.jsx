@@ -20,7 +20,10 @@ function Layout() {
           <Menu>
             {user ? (
               <>
-                <UserBadge>
+                <TextButton as={Link} to="/class">
+                  우리 반
+                </TextButton>
+                <UserBadge to="/mypage">
                   {user.nickname}({user.grade}-{user.class_no})
                 </UserBadge>
                 <TextButton onClick={handleLogout}>로그아웃</TextButton>
@@ -85,12 +88,12 @@ const Menu = styled.nav`
   min-width: 0;
 `
 
-const UserBadge = styled.span`
+const UserBadge = styled(Link)`
   max-width: 160px;
   height: 32px;
   line-height: 32px;
   padding: 0 12px;
-  margin-right: 4px;
+  margin: 0 4px;
   border-radius: ${radius.chip};
   background: ${colors.gray};
   color: ${colors.text};
@@ -99,9 +102,16 @@ const UserBadge = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: background 0.15s;
+
+  &:hover {
+    background: ${colors.grayHover};
+  }
 
   ${mobile} {
-    max-width: 110px;
+    max-width: 96px;
+    padding: 0 10px;
+    margin: 0 2px;
   }
 `
 
@@ -119,6 +129,11 @@ const TextButton = styled.button`
   &:hover {
     background: ${colors.gray};
     color: ${colors.text};
+  }
+
+  ${mobile} {
+    padding: 0 8px;
+    font-size: 13px;
   }
 `
 

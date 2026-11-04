@@ -42,6 +42,22 @@ router.get('/', async (req, res) => {
   }
 })
 
+router.get('/my-class', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      SELECT_POST +
+        ` JOIN users me ON me.id = ?
+          WHERE u.grade = me.grade AND u.class_no = me.class_no
+          ORDER BY p.id DESC`,
+      [req.user.id],
+    )
+    res.json(rows)
+  } catch (err) {
+    console.error('우리 반 글 오류:', err)
+    res.status(500).json({ message: '서버 오류로 우리 반 글을 불러오지 못했습니다.' })
+  }
+})
+
 router.get('/:id', async (req, res) => {
   try {
     const [rows] = await pool.query(SELECT_POST + ' WHERE p.id = ?', [req.params.id])

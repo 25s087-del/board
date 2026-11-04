@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage.jsx'
 import PostDetailPage from './pages/PostDetailPage.jsx'
 import PostCreatePage from './pages/PostCreatePage.jsx'
 import PostEditPage from './pages/PostEditPage.jsx'
+import MyPage from './pages/MyPage.jsx'
+import ClassPage from './pages/ClassPage.jsx'
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/posts/new" element={<PostCreatePage />} />
         <Route path="/posts/:id" element={<PostDetailPage />} />
         <Route path="/posts/:id/edit" element={<PostEditPage />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/class" element={<ClassPage />} />
         <Route path="*" element={<p>없는 페이지입니다.</p>} />
       </Route>
     </Routes>
