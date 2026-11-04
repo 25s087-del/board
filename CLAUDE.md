@@ -24,7 +24,8 @@
 - 한 번에 한 단계만 구현하고, 끝나면 내가 직접 확인할 방법을 알려줄 것
 - 내가 확인했다고 하면 git add . → git commit -m "Feat: 작업내용" → git push origin main
 - .env와 node_modules는 절대 커밋하지 않기
-- 코드에 한국어 주석을 달아 내가 이해할 수 있게 할 것
+- 코드에 주석을 달지 않기 (eslint-disable 같은 설정용 주석만 예외)
+- 디자인 규칙: src/styles/theme.js 사용, 새 화면은 PostCard·CategoryChip·Form 스타일 재사용
 - 단계를 끝낼 때마다 아래 진행 기록에 한 줄 추가
 - 학교 PC라 매번 대화 기록이 사라짐. 푸시 전에 반드시 진행 기록의 "완료한 단계"와 "다음 할 일"을 갱신할 것
 - server/.env.example(비밀번호 없이 키 이름만)을 만들어 커밋할 것 (새 PC에서는 이걸 복사해 server/.env를 만들고, client·server 각각 npm install)
@@ -35,8 +36,10 @@
 - 2단계(DB 스키마) 완료: server/schema.sql (DB 생성, users·posts 테이블), 화면 제목·헤더 로고 "학급 게시판"으로 변경. 로컬 MySQL에 전용 계정 '20503'@'localhost' 생성, "✅ DB 연결 성공" 확인. git 계정은 이 프로젝트에만(--local) 25s087-del로 설정, 첫 커밋 작성자 변경 후 force push
 
 - 3·4단계(회원가입·로그인) 완료: server(routes/users.js — signup(bcrypt, 이메일 중복 409, 학년1~3·반1~20 검사), login(JWT 1일, token+user 반환), me(auth 필요, 비밀번호 제외) / middlewares/auth.js — Bearer 토큰 검사 후 req.user), client(api.js — axios에 토큰 자동 첨부, AuthContext.jsx — localStorage에 token·user 저장, SignupPage, LoginPage, components/Form.jsx 공통 폼 스타일, Header에 로그인 상태별 메뉴 "닉네임(학년-반)"). 화면에서 확인 완료
+- 5단계(게시글 CRUD) 작성: server/routes/posts.js (목록 posts JOIN users + ?category 필터, 상세, 작성(auth), 수정·삭제(auth + 본인 아니면 403)), client(Home 목록·필터, PostDetailPage, PostCreatePage, PostEditPage, components/PostForm.jsx, constants.js). 화면에서 확인 완료
+- 디자인(Style) 완료: styles/theme.js(색·둥글기·그림자·카테고리 색·모바일 480px), index.html에 Pretendard CDN, components/PostCard·CategoryChip, Form.jsx(Card·Button·TextArea 추가), 헤더 sticky, 전체 코드 주석 제거. 화면에서 확인 완료
 
 ### 다음 할 일
-- 5단계: 게시글 작성 API·화면 (로그인 필요, auth 미들웨어 사용, 카테고리 공지/수행평가/자유/분실물)
-- 이후: 메인 전체 목록+카테고리 필터(작성자 닉네임·학년·반 JOIN), 글 상세·수정·삭제(본인만), 우리 반 글, 마이페이지 조회·수정·탈퇴(/api/users/me 활용)
+- 6단계: 우리 반 글 (GET /api/posts/my-class, posts JOIN users로 로그인 사용자와 같은 학년·반 글, 헤더 메뉴 추가)
+- 이후: 마이페이지 조회·수정(학년·반 포함)·탈퇴 (/api/users/me 활용)
 - (새 PC라면) server/.env.example 복사 → server/.env 작성(DB_USER=20503, 비밀번호), client·server에서 npm install, git config user.name/email(--local) 설정

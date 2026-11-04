@@ -3,19 +3,18 @@ import { Link, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import api, { getErrorMessage } from '../api.js'
 import { useAuth } from '../AuthContext.jsx'
-import { CATEGORIES, formatDate } from '../constants.js'
+import { CATEGORIES } from '../constants.js'
+import PostCard from '../components/PostCard.jsx'
+import { ErrorText } from '../components/Form.jsx'
+import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
-// 메인 화면: 전체 글 목록 + 카테고리 필터
 function Home() {
   const { user } = useAuth()
-  // 선택한 카테고리를 주소(?category=자유)에 저장 → 새로고침·뒤로가기해도 유지됨
   const [searchParams, setSearchParams] = useSearchParams()
-  const category = searchParams.get('category') || '' // '' = 전체
+  const category = searchParams.get('category') || ''
 
-  // 서버에서 받은 결과를 "어느 카테고리의 결과인지"와 함께 저장
   const [result, setResult] = useState({ category: null, posts: [], error: '' })
 
-  // 카테고리가 바뀔 때마다 목록을 다시 불러옴
   useEffect(() => {
     api
       .get('/posts', { params: category ? { category } : {} })
@@ -23,7 +22,6 @@ function Home() {
       .catch((err) => setResult({ category, posts: [], error: getErrorMessage(err) }))
   }, [category])
 
-  // 저장된 결과가 지금 선택한 카테고리 것이 아니면 아직 불러오는 중
   const loading = result.category !== category
   const posts = loading ? [] : result.posts
   const error = loading ? '' : result.error
@@ -34,129 +32,155 @@ function Home() {
 
   return (
     <div>
-      <Top>
-        <h2>{category || '전체'} 글</h2>
-        {/* 로그인한 사람에게만 글쓰기 버튼 보이기 */}
+      <Hero>
+        <h1>학급 게시판</h1>
+        <p>공지, 수행평가, 분실물 소식까지 우리 학교 이야기를 한곳에서 확인하세요.</p>
+      </Hero>
+
+      <Toolbar>
+        <Filters>
+          <FilterChip $active={category === ''} onClick={() => selectCategory('')}>
+            전체
+          </FilterChip>
+          {CATEGORIES.map((c) => (
+            <FilterChip key={c} $active={category === c} onClick={() => selectCategory(c)}>
+              {c}
+            </FilterChip>
+          ))}
+        </Filters>
         {user && <WriteButton to="/posts/new">글쓰기</WriteButton>}
-      </Top>
+      </Toolbar>
 
-      <Filters>
-        <FilterButton $active={category === ''} onClick={() => selectCategory('')}>
-          전체
-        </FilterButton>
-        {CATEGORIES.map((c) => (
-          <FilterButton key={c} $active={category === c} onClick={() => selectCategory(c)}>
-            {c}
-          </FilterButton>
-        ))}
-      </Filters>
-
-      {error && <Message $error>{error}</Message>}
-      {!error && loading && <Message>불러오는 중...</Message>}
-      {!error && !loading && posts.length === 0 && <Message>아직 글이 없습니다.</Message>}
+      {error && <ErrorText>{error}</ErrorText>}
+      {!error && loading && <Empty>불러오는 중...</Empty>}
+      {!error && !loading && posts.length === 0 && (
+        <Empty>
+          <strong>아직 글이 없어요</strong>
+          <span>{user ? '첫 번째 글을 남겨 보세요.' : '로그인하면 글을 쓸 수 있어요.'}</span>
+        </Empty>
+      )}
 
       <List>
         {posts.map((post) => (
-          <Item key={post.id}>
-            <Link to={`/posts/${post.id}`}>
-              <Badge>{post.category}</Badge>
-              <Title>{post.title}</Title>
-              <Meta>
-                {post.nickname}({post.grade}학년 {post.class_no}반) · {formatDate(post.created_at)}
-              </Meta>
-            </Link>
-          </Item>
+          <li key={post.id}>
+            <PostCard post={post} />
+          </li>
         ))}
       </List>
     </div>
   )
 }
 
-const Top = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+const Hero = styled.section`
+  padding: 28px 4px 24px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  p {
+    font-size: 15px;
+    color: ${colors.subText};
+  }
+
+  ${mobile} {
+    padding: 12px 0 18px;
+
+    h1 {
+      font-size: 24px;
+    }
+  }
 `
 
-const WriteButton = styled(Link)`
-  padding: 8px 16px;
-  border-radius: 4px;
-  background: #2f6fed;
-  color: #fff;
-  font-weight: bold;
+const Toolbar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  ${mobile} {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
 `
 
 const Filters = styled.div`
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
-`
+  overflow-x: auto;
+  scrollbar-width: none;
 
-// $active: 선택된 버튼이면 파란색 (styled-components 에서 $ 붙은 props 는 화면 태그로 넘어가지 않음)
-const FilterButton = styled.button`
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid ${(p) => (p.$active ? '#2f6fed' : '#ccc')};
-  background: ${(p) => (p.$active ? '#2f6fed' : '#fff')};
-  color: ${(p) => (p.$active ? '#fff' : '#333')};
-  font-size: 14px;
-`
-
-const List = styled.ul`
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-
-  &:empty {
+  &::-webkit-scrollbar {
     display: none;
   }
 `
 
-const Item = styled.li`
-  border-bottom: 1px solid #eee;
+const FilterChip = styled.button`
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: ${radius.chip};
+  background: ${(p) => (p.$active ? colors.text : colors.surface)};
+  color: ${(p) => (p.$active ? colors.white : colors.subText)};
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: ${(p) => (p.$active ? 'none' : `inset 0 0 0 1px ${colors.border}`)};
+  transition: background 0.15s, color 0.15s;
 
-  &:last-child {
-    border-bottom: none;
+  &:hover {
+    color: ${(p) => (p.$active ? colors.white : colors.text)};
   }
-
-  a {
-    display: block;
-    padding: 14px 18px;
-  }
-
-  a:hover {
-    background: #f4f7ff;
-  }
 `
 
-const Badge = styled.span`
-  display: inline-block;
-  padding: 2px 8px;
-  margin-right: 8px;
-  border-radius: 4px;
-  background: #eef3ff;
-  color: #2f6fed;
-  font-size: 12px;
-  font-weight: bold;
-`
-
-const Title = styled.span`
-  font-weight: bold;
-`
-
-const Meta = styled.p`
-  margin-top: 6px;
-  font-size: 13px;
-  color: #888;
-`
-
-const Message = styled.p`
-  padding: 24px;
+const WriteButton = styled(Link)`
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: ${radius.control};
+  background: ${colors.primary};
+  color: ${colors.white};
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 40px;
   text-align: center;
-  color: ${(p) => (p.$error ? '#d32f2f' : '#888')};
+  transition: background 0.15s;
+
+  &:hover {
+    background: ${colors.primaryHover};
+  }
+
+  ${mobile} {
+    height: 44px;
+    line-height: 44px;
+  }
+`
+
+const List = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`
+
+const Empty = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 56px 16px;
+  background: ${colors.surface};
+  border-radius: ${radius.card};
+  box-shadow: ${shadow};
+  color: ${colors.subText};
+  font-size: 14px;
+  text-align: center;
+
+  strong {
+    font-size: 17px;
+    color: ${colors.text};
+  }
 `
 
 export default Home

@@ -18,11 +18,10 @@ function LoginPage() {
     setLoading(true)
     try {
       const res = await api.post('/users/login', { email, password })
-      // 서버가 준 token 과 user 정보를 localStorage 에 저장 (AuthContext 의 login)
       login(res.data.token, res.data.user)
-      navigate('/') // 메인으로 이동
+      navigate('/')
     } catch (err) {
-      setError(getErrorMessage(err)) // 예: 401 → "이메일 또는 비밀번호가 올바르지 않습니다."
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }

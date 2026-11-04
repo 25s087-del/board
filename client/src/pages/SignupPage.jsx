@@ -5,7 +5,6 @@ import { FormBox, Label, Input, Select, Row, SubmitButton, ErrorText, Bottom } f
 
 function SignupPage() {
   const navigate = useNavigate()
-  // 입력값들을 하나의 객체로 관리
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -17,16 +16,14 @@ function SignupPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // 입력칸의 name 속성을 이용해 해당 값만 바꿈
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault() // 폼 제출 시 새로고침 막기
+    e.preventDefault()
     setError('')
 
-    // 서버에 보내기 전에 화면에서 먼저 검사
     if (form.password !== form.passwordCheck) {
       setError('비밀번호와 비밀번호 확인이 일치하지 않습니다.')
       return
@@ -44,7 +41,7 @@ function SignupPage() {
       alert('회원가입이 완료되었습니다. 로그인해 주세요.')
       navigate('/login')
     } catch (err) {
-      setError(getErrorMessage(err)) // 예: 409 → "이미 가입된 이메일입니다."
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }

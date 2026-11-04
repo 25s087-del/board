@@ -2,11 +2,9 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { CATEGORIES } from '../constants.js'
 import { getErrorMessage } from '../api.js'
-import { Label, Input, Select, SubmitButton, ErrorText } from './Form.jsx'
+import { Label, Input, Select, TextArea, SubmitButton, ErrorText } from './Form.jsx'
+import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
-// 글 작성·수정 화면에서 같이 쓰는 입력 폼
-// initial: 처음 채워둘 값 (수정할 때는 기존 글 내용)
-// onSubmit: 등록/수정 버튼을 눌렀을 때 실행할 함수 (부모 페이지가 넘겨줌)
 function PostForm({ title, initial, submitText, onSubmit }) {
   const [form, setForm] = useState(
     initial || { category: '자유', title: '', content: '' },
@@ -25,7 +23,7 @@ function PostForm({ title, initial, submitText, onSubmit }) {
     try {
       await onSubmit(form)
     } catch (err) {
-      setError(getErrorMessage(err)) // 서버가 보낸 에러 메시지를 화면에 표시
+      setError(getErrorMessage(err))
       setLoading(false)
     }
   }
@@ -60,21 +58,25 @@ function PostForm({ title, initial, submitText, onSubmit }) {
 }
 
 const Box = styled.form`
+  max-width: 720px;
+  margin: 0 auto;
   padding: 32px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: ${colors.surface};
+  border-radius: ${radius.card};
+  box-shadow: ${shadow};
   display: flex;
   flex-direction: column;
-  gap: 14px;
-`
+  gap: 16px;
 
-const TextArea = styled.textarea`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-weight: normal;
-  resize: vertical;
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  ${mobile} {
+    padding: 24px 20px;
+  }
 `
 
 export default PostForm

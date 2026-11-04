@@ -1,14 +1,21 @@
-/* 브라우저 기본 스타일 초기화 */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  font-family: 'Malgun Gothic', sans-serif;
-  background: #f7f7f7;
-  color: #222;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Malgun Gothic', sans-serif;
+  background: #F4F6F8;
+  color: #191F28;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
 }
 
 a {
@@ -26,9 +33,11 @@ button {
   border: none;
   background: none;
   font: inherit;
+  color: inherit;
 }
 
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }

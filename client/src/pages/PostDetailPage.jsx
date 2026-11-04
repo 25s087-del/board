@@ -4,11 +4,12 @@ import styled from 'styled-components'
 import api, { getErrorMessage } from '../api.js'
 import { useAuth } from '../AuthContext.jsx'
 import { formatDate } from '../constants.js'
-import { ErrorText } from '../components/Form.jsx'
+import { ErrorText, Button } from '../components/Form.jsx'
+import CategoryChip from '../components/CategoryChip.jsx'
+import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
-// 글 상세 화면: /posts/:id
 function PostDetailPage() {
-  const { id } = useParams() // 주소의 :id 부분
+  const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [post, setPost] = useState(null)
@@ -22,7 +23,7 @@ function PostDetailPage() {
   }, [id])
 
   const handleDelete = async () => {
-    if (!window.confirm('정말 이 글을 삭제할까요?')) return // 확인창에서 취소하면 중단
+    if (!window.confirm('정말 이 글을 삭제할까요?')) return
     try {
       await api.delete(`/posts/${id}`)
       navigate('/')
@@ -34,13 +35,12 @@ function PostDetailPage() {
   if (error && !post) return <ErrorText>{error}</ErrorText>
   if (!post) return <p>불러오는 중...</p>
 
-  // 로그인한 사람이 이 글의 작성자인지
   const isMine = user && user.id === post.user_id
 
   return (
     <Box>
       {error && <ErrorText>{error}</ErrorText>}
-      <Badge>{post.category}</Badge>
+      <CategoryChip category={post.category} />
       <h2>{post.title}</h2>
       <Meta>
         {post.nickname}({post.grade}학년 {post.class_no}반) · 작성 {formatDate(post.created_at)}
@@ -50,11 +50,10 @@ function PostDetailPage() {
 
       <Buttons>
         <Button as={Link} to="/">목록</Button>
-        {/* 본인 글일 때만 수정·삭제 버튼 보이기 */}
         {isMine && (
           <>
             <Button as={Link} to={`/posts/${id}/edit`}>수정</Button>
-            <Button $danger onClick={handleDelete}>삭제</Button>
+            <Button $variant="danger" onClick={handleDelete}>삭제</Button>
           </>
         )}
       </Buttons>
@@ -63,54 +62,58 @@ function PostDetailPage() {
 }
 
 const Box = styled.article`
+  max-width: 720px;
+  margin: 0 auto;
   padding: 32px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: ${colors.surface};
+  border-radius: ${radius.card};
+  box-shadow: ${shadow};
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 12px;
-`
 
-const Badge = styled.span`
-  align-self: flex-start;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: #eef3ff;
-  color: #2f6fed;
-  font-size: 12px;
-  font-weight: bold;
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.4;
+    word-break: break-all;
+  }
+
+  ${mobile} {
+    padding: 24px 20px;
+
+    h2 {
+      font-size: 21px;
+    }
+  }
 `
 
 const Meta = styled.p`
-  font-size: 13px;
-  color: #888;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #eee;
+  width: 100%;
+  padding-bottom: 16px;
+  border-bottom: 1px solid ${colors.border};
+  font-size: 14px;
+  color: ${colors.subText};
 `
 
 const Content = styled.div`
+  width: 100%;
   min-height: 160px;
-  line-height: 1.7;
-  white-space: pre-wrap; /* 입력한 줄바꿈을 그대로 보여줌 */
+  padding: 8px 0;
+  font-size: 16px;
+  line-height: 1.75;
+  white-space: pre-wrap;
   word-break: break-all;
 `
 
 const Buttons = styled.div`
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
-`
-
-const Button = styled.button`
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: 1px solid ${(p) => (p.$danger ? '#d32f2f' : '#ccc')};
-  color: ${(p) => (p.$danger ? '#d32f2f' : '#333')};
-  background: #fff;
-  font-size: 14px;
+  padding-top: 16px;
+  border-top: 1px solid ${colors.border};
 `
 
 export default PostDetailPage
