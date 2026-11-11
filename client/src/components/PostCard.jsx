@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import CategoryChip from './CategoryChip.jsx'
-import { formatDate } from '../constants.js'
+import { formatDate, authorName, authorClass } from '../constants.js'
 import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
 function PostCard({ post }) {
@@ -11,10 +11,8 @@ function PostCard({ post }) {
       <Title>{post.title}</Title>
       <Preview>{post.content}</Preview>
       <Meta>
-        <strong>{post.nickname}</strong>
-        <span>
-          {post.grade}학년 {post.class_no}반
-        </span>
+        <strong>{authorName(post)}</strong>
+        {authorClass(post) && <span>{authorClass(post)}</span>}
         <span>{formatDate(post.created_at)}</span>
       </Meta>
     </Card>

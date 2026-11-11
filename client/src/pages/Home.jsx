@@ -10,6 +10,7 @@ import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
 function Home() {
   const { user } = useAuth()
+  const userId = user?.user_id
   const [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category') || ''
 
@@ -20,7 +21,7 @@ function Home() {
       .get('/posts', { params: category ? { category } : {} })
       .then((res) => setResult({ category, posts: res.data, error: '' }))
       .catch((err) => setResult({ category, posts: [], error: getErrorMessage(err) }))
-  }, [category])
+  }, [category, userId])
 
   const loading = result.category !== category
   const posts = loading ? [] : result.posts

@@ -7,7 +7,7 @@ import { FormBox, Label, Input, SubmitButton, ErrorText, Bottom } from '../compo
 function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
-  const [email, setEmail] = useState('')
+  const [userId, setUserId] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,7 +17,7 @@ function LoginPage() {
     setError('')
     setLoading(true)
     try {
-      const res = await api.post('/users/login', { email, password })
+      const res = await api.post('/users/login', { user_id: userId, password })
       login(res.data.token, res.data.user)
       navigate('/')
     } catch (err) {
@@ -33,8 +33,8 @@ function LoginPage() {
       {error && <ErrorText>{error}</ErrorText>}
 
       <Label>
-        이메일
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        아이디
+        <Input value={userId} onChange={(e) => setUserId(e.target.value)} autoComplete="username" required />
       </Label>
       <Label>
         비밀번호

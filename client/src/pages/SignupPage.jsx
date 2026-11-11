@@ -6,7 +6,7 @@ import { FormBox, Label, Input, Select, Row, SubmitButton, ErrorText, Bottom } f
 function SignupPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    email: '',
+    user_id: '',
     password: '',
     passwordCheck: '',
     nickname: '',
@@ -32,7 +32,7 @@ function SignupPage() {
     setLoading(true)
     try {
       await api.post('/users/signup', {
-        email: form.email,
+        user_id: form.user_id,
         password: form.password,
         nickname: form.nickname,
         grade: Number(form.grade),
@@ -53,8 +53,17 @@ function SignupPage() {
       {error && <ErrorText>{error}</ErrorText>}
 
       <Label>
-        이메일
-        <Input type="email" name="email" value={form.email} onChange={handleChange} required />
+        아이디 (영문·숫자 4~20자)
+        <Input
+          name="user_id"
+          value={form.user_id}
+          onChange={handleChange}
+          pattern="[A-Za-z0-9]{4,20}"
+          title="영문·숫자 4~20자"
+          maxLength={20}
+          autoComplete="username"
+          required
+        />
       </Label>
       <Label>
         비밀번호 (4자 이상)

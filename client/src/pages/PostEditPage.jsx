@@ -22,7 +22,7 @@ function PostEditPage() {
   if (!user) return <Navigate to="/login" replace />
   if (error) return <ErrorText>{error}</ErrorText>
   if (!post) return <p>불러오는 중...</p>
-  if (post.user_id !== user.id) return <ErrorText>본인이 쓴 글만 수정할 수 있습니다.</ErrorText>
+  if (!post.is_mine) return <ErrorText>본인이 쓴 글만 수정할 수 있습니다.</ErrorText>
 
   const handleSubmit = async (form) => {
     await api.put(`/posts/${id}`, form)
@@ -33,7 +33,12 @@ function PostEditPage() {
     <PostForm
       title="글 수정"
       submitText="수정 완료"
-      initial={{ category: post.category, title: post.title, content: post.content }}
+      initial={{
+        category: post.category,
+        title: post.title,
+        content: post.content,
+        is_anonymous: post.is_anonymous,
+      }}
       onSubmit={handleSubmit}
     />
   )

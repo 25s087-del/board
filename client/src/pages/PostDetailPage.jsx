@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import api, { getErrorMessage } from '../api.js'
-import { useAuth } from '../AuthContext.jsx'
-import { formatDate } from '../constants.js'
+import { formatDate, authorName, authorClass } from '../constants.js'
 import { ErrorText, Button } from '../components/Form.jsx'
 import CategoryChip from '../components/CategoryChip.jsx'
 import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
 function PostDetailPage() {
   const { id } = useParams()
-  const { user } = useAuth()
   const navigate = useNavigate()
   const [post, setPost] = useState(null)
   const [error, setError] = useState('')
@@ -35,22 +33,21 @@ function PostDetailPage() {
   if (error && !post) return <ErrorText>{error}</ErrorText>
   if (!post) return <p>불러오는 중...</p>
 
-  const isMine = user && user.id === post.user_id
-
   return (
     <Box>
       {error && <ErrorText>{error}</ErrorText>}
       <CategoryChip category={post.category} />
       <h2>{post.title}</h2>
       <Meta>
-        {post.nickname}({post.grade}학년 {post.class_no}반) · 작성 {formatDate(post.created_at)}
+        {authorName(post)}
+        {authorClass(post) && ` (${authorClass(post)})`} · 작성 {formatDate(post.created_at)}
         {post.updated_at !== post.created_at && ` · 수정 ${formatDate(post.updated_at)}`}
       </Meta>
       <Content>{post.content}</Content>
 
       <Buttons>
         <Button as={Link} to="/">목록</Button>
-        {isMine && (
+        {post.is_mine && (
           <>
             <Button as={Link} to={`/posts/${id}/edit`}>수정</Button>
             <Button $variant="danger" onClick={handleDelete}>삭제</Button>

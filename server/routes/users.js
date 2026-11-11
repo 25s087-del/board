@@ -6,6 +6,10 @@ import auth from '../middlewares/auth.js'
 
 const router = Router()
 
+function isValidUserId(user_id) {
+  return typeof user_id === 'string' && /^[A-Za-z0-9]{4,20}$/.test(user_id)
+}
+
 function isValidGradeClass(grade, class_no) {
   return (
     Number.isInteger(grade) && grade >= 1 && grade <= 3 &&
@@ -15,7 +19,7 @@ function isValidGradeClass(grade, class_no) {
 
 function issueToken(user) {
   const info = {
-    id: user.id,
+    user_id: user.user_id,
     nickname: user.nickname,
     grade: user.grade,
     class_no: user.class_no,
@@ -25,12 +29,15 @@ function issueToken(user) {
 }
 
 router.post('/signup', async (req, res) => {
-  const { email, password, nickname } = req.body
+  const { user_id, password, nickname } = req.body
   const grade = Number(req.body.grade)
   const class_no = Number(req.body.class_no)
 
-  if (!email || !password || !nickname) {
-    return res.status(400).json({ message: '이메일, 비밀번호, 닉네임을 모두 입력해 주세요.' })
+  if (!user_id || !password || !nickname) {
+    return res.status(400).json({ message: '아이디, 비밀번호, 닉네임을 모두 입력해 주세요.' })
+  }
+  if (!isValidUserId(user_id)) {
+    return res.status(400).json({ message: '아이디는 영문·숫자 4~20자로 입력해 주세요.' })
   }
   if (password.length < 4) {
     return res.status(400).json({ message: '비밀번호는 4자 이상이어야 합니다.' })
@@ -40,38 +47,41 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.query('SELECT id FROM users WHERE email = ?', [email])
+    const [rows] = await pool.query('SELECT id FROM users WHERE user_id = ?', [user_id])
     if (rows.length > 0) {
-      return res.status(409).json({ message: '이미 가입된 이메일입니다.' })
+      return res.status(409).json({ message: '이미 사용 중인 아이디입니다.' })
     }
 
     const hashed = await bcrypt.hash(password, 10)
 
-    const [result] = await pool.query(
-      'INSERT INTO users (email, password, nickname, grade, class_no) VALUES (?, ?, ?, ?, ?)',
-      [email, hashed, nickname, grade, class_no],
+    await pool.query(
+      'INSERT INTO users (user_id, password, nickname, grade, class_no) VALUES (?, ?, ?, ?, ?)',
+      [user_id, hashed, nickname, grade, class_no],
     )
 
-    res.status(201).json({ message: '회원가입이 완료되었습니다.', id: result.insertId })
+    res.status(201).json({ message: '회원가입이 완료되었습니다.', user_id })
   } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: '이미 사용 중인 아이디입니다.' })
+    }
     console.error('회원가입 오류:', err)
     res.status(500).json({ message: '서버 오류로 회원가입에 실패했습니다.' })
   }
 })
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body
+  const { user_id, password } = req.body
 
-  if (!email || !password) {
-    return res.status(400).json({ message: '이메일과 비밀번호를 입력해 주세요.' })
+  if (!user_id || !password) {
+    return res.status(400).json({ message: '아이디와 비밀번호를 입력해 주세요.' })
   }
 
   try {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email])
+    const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [user_id])
     const user = rows[0]
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' })
+      return res.status(401).json({ message: '아이디 또는 비밀번호가 올바르지 않습니다.' })
     }
 
     res.json({ message: '로그인 성공', ...issueToken(user) })
@@ -84,8 +94,8 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, email, nickname, grade, class_no, created_at, updated_at FROM users WHERE id = ?',
-      [req.user.id],
+      'SELECT user_id, nickname, grade, class_no, created_at, updated_at FROM users WHERE user_id = ?',
+      [req.user.user_id],
     )
     if (rows.length === 0) {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' })
@@ -116,17 +126,17 @@ router.put('/me', auth, async (req, res) => {
     if (password) {
       const hashed = await bcrypt.hash(password, 10)
       await pool.query(
-        'UPDATE users SET nickname = ?, grade = ?, class_no = ?, password = ? WHERE id = ?',
-        [nickname.trim(), grade, class_no, hashed, req.user.id],
+        'UPDATE users SET nickname = ?, grade = ?, class_no = ?, password = ? WHERE user_id = ?',
+        [nickname.trim(), grade, class_no, hashed, req.user.user_id],
       )
     } else {
       await pool.query(
-        'UPDATE users SET nickname = ?, grade = ?, class_no = ? WHERE id = ?',
-        [nickname.trim(), grade, class_no, req.user.id],
+        'UPDATE users SET nickname = ?, grade = ?, class_no = ? WHERE user_id = ?',
+        [nickname.trim(), grade, class_no, req.user.user_id],
       )
     }
 
-    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [req.user.id])
+    const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [req.user.user_id])
     if (rows.length === 0) {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' })
     }
@@ -139,7 +149,7 @@ router.put('/me', auth, async (req, res) => {
 
 router.delete('/me', auth, async (req, res) => {
   try {
-    const [result] = await pool.query('DELETE FROM users WHERE id = ?', [req.user.id])
+    const [result] = await pool.query('DELETE FROM users WHERE user_id = ?', [req.user.user_id])
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' })
     }

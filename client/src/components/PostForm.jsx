@@ -3,17 +3,19 @@ import styled from 'styled-components'
 import { CATEGORIES } from '../constants.js'
 import { getErrorMessage } from '../api.js'
 import { Label, Input, Select, TextArea, SubmitButton, ErrorText } from './Form.jsx'
+import Toggle from './Toggle.jsx'
 import { colors, radius, shadow, mobile } from '../styles/theme.js'
 
 function PostForm({ title, initial, submitText, onSubmit }) {
   const [form, setForm] = useState(
-    initial || { category: '자유', title: '', content: '' },
+    initial || { category: '자유', title: '', content: '', is_anonymous: false },
   )
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, type, value, checked } = e.target
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
   }
 
   const handleSubmit = async (e) => {
@@ -49,6 +51,13 @@ function PostForm({ title, initial, submitText, onSubmit }) {
         내용
         <TextArea name="content" value={form.content} onChange={handleChange} rows={12} required />
       </Label>
+      <Toggle
+        label="익명으로 올리기"
+        description="다른 사람에게 닉네임과 학년·반이 보이지 않아요"
+        name="is_anonymous"
+        checked={form.is_anonymous}
+        onChange={handleChange}
+      />
 
       <SubmitButton type="submit" disabled={loading}>
         {loading ? '저장 중...' : submitText}

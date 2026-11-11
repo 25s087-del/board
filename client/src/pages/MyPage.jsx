@@ -19,7 +19,7 @@ import { colors, radius } from '../styles/theme.js'
 
 function MyPage() {
   const { user, login, logout } = useAuth()
-  const userId = user?.id
+  const userId = user?.user_id
   const navigate = useNavigate()
   const [me, setMe] = useState(null)
   const [form, setForm] = useState(null)
@@ -97,8 +97,8 @@ function MyPage() {
       {success && <SuccessText>{success}</SuccessText>}
 
       <Info>
-        <span>이메일</span>
-        <strong>{me.email}</strong>
+        <span>아이디</span>
+        <strong>{me.user_id}</strong>
         <span>가입일</span>
         <strong>{formatDate(me.created_at)}</strong>
       </Info>

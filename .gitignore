@@ -1,3 +1,6 @@
 node_modules
 .env
 dist
+server/backup*.json
+CLAUDE.md
+README.md
